@@ -479,6 +479,10 @@ harness the AmbX protocol.</p></div>
 </div>
 <h2 id="_device_information">2. Device information</h2>
 <div class="sectionbody">
+<div class="paragraph"><p>The device has 3 endpoints</p></div>
+<div class="paragraph"><p>*0x02 - Out
+*0x81 - In
+*0x83 - In - Constantly polled, used for plug and play detection</p></div>
 </div>
 <h2 id="_protocol_information">3. Protocol Information</h2>
 <div class="sectionbody">
@@ -541,43 +545,123 @@ be set in the left wall washer unit light is black.
 </p>
 </dd>
 </dl></div>
+<h3 id="_internal_device_addresses">3.2. Internal Device Addresses</h3><div style="clear:left"></div>
+<div class="dlist"><dl>
+<dt class="hdlist1">
+0x0B
+</dt>
+<dd>
+<p>
+Left Speaker light
+</p>
+</dd>
+<dt class="hdlist1">
+0x1B
+</dt>
+<dd>
+<p>
+Right Speaker light
+</p>
+</dd>
+<dt class="hdlist1">
+0x2B
+</dt>
+<dd>
+<p>
+Left (when viewed from front) Wall Washer light
+</p>
+</dd>
+<dt class="hdlist1">
+0x3B
+</dt>
+<dd>
+<p>
+Middle Wall Washer light
+</p>
+</dd>
+<dt class="hdlist1">
+0x4B
+</dt>
+<dd>
+<p>
+Right Wall Washer light
+</p>
+</dd>
+<dt class="hdlist1">
+0x5B
+</dt>
+<dd>
+<p>
+Left Fan
+</p>
+</dd>
+<dt class="hdlist1">
+0x6B
+</dt>
+<dd>
+<p>
+Right Fan
+</p>
+</dd>
+<dt class="hdlist1">
+0x7B
+</dt>
+<dd>
+<p>
+Vibration Bar
+</p>
+</dd>
+<dt class="hdlist1">
+0x7C
+</dt>
+<dd>
+<p>
+Also Vibration Bar?
+</p>
+</dd>
+</dl></div>
 </div>
-<h2 id="_light_commands">4. Light Commands</h2>
+<h2 id="_initialization">4. Initialization</h2>
 <div class="sectionbody">
-<h3 id="_set_light_to_color">4.1. Set Light To Color</h3><div style="clear:left"></div>
-<h4 id="_description">4.1.1. Description</h4>
+<div class="paragraph"><p>There&#8217;s some sort of initialization step when the device is
+connected. What is it?</p></div>
+</div>
+<h2 id="_light_commands">5. Light Commands</h2>
+<div class="sectionbody">
+<h3 id="_set_light_to_color">5.1. Set Light To Color</h3><div style="clear:left"></div>
+<h4 id="_description">5.1.1. Description</h4>
 <div class="paragraph"><p>Given the address of a light, sets it to a certain RGB Color</p></div>
-<h4 id="_setup_requirements">4.1.2. Setup Requirements</h4>
+<h4 id="_setup_requirements">5.1.2. Setup Requirements</h4>
 <div class="paragraph"><p>Unknown</p></div>
-<h4 id="_command_index">4.1.3. Command Index</h4>
+<h4 id="_command_index">5.1.3. Command Index</h4>
 <div class="listingblock">
 <div class="content">
 <pre><tt>0x03</tt></pre>
 </div></div>
-<h4 id="_parameters">4.1.4. Parameters</h4>
+<h4 id="_parameters">5.1.4. Parameters</h4>
 <div class="paragraph"><p>3 bytes, denoting the values to set the red, green, and blue channels
 to.</p></div>
-<h4 id="_example_command">4.1.5. Example Command</h4>
+<h4 id="_example_command">5.1.5. Example Command</h4>
 <div class="listingblock">
+<div class="title">Set Left Wall Washer Light to Full Blue</div>
 <div class="content">
-<pre><tt>Index: 01 23 45 67 89 AB
- Data: A1 2B 03 00 00 00</tt></pre>
+<pre><tt>A1 2B 03 00 00 FF</tt></pre>
 </div></div>
-<h3 id="_timed_color_sequence">4.2. Timed Color Sequence</h3><div style="clear:left"></div>
-<h4 id="_description_2">4.2.1. Description</h4>
+<h3 id="_timed_color_sequence">5.2. Timed Color Sequence</h3><div style="clear:left"></div>
+<h4 id="_description_2">5.2.1. Description</h4>
 <div class="paragraph"><p>Given the address of a light and a delay value, iterate through a list
 of colors, holding each color for the specified delay value.</p></div>
-<h4 id="_setup_requirements_2">4.2.2. Setup Requirements</h4>
+<h4 id="_setup_requirements_2">5.2.2. Setup Requirements</h4>
 <div class="paragraph"><p>Unknown</p></div>
-<h4 id="_command_index_2">4.2.3. Command Index</h4>
+<h4 id="_command_index_2">5.2.3. Command Index</h4>
 <div class="listingblock">
 <div class="content">
 <pre><tt>0x72</tt></pre>
 </div></div>
-<h4 id="_parameters_2">4.2.4. Parameters</h4>
+<h4 id="_parameters_2">5.2.4. Parameters</h4>
 <div class="paragraph"><p>Byte 3 (Nibbles 6-7) and 4 (Nibbles 8-9) denote the 16-bit delay time,
 in milliseconds. After that, a list of 16 3-byte colors are sent.</p></div>
-<h4 id="_example_command_2">4.2.5. Example Command</h4>
+<h4 id="_example_command_2">5.2.5. Example Command</h4>
 <div class="listingblock">
 <div class="title">Full Command</div>
 <div class="content">
@@ -591,8 +675,8 @@ in milliseconds. After that, a list of 16 3-byte colors are sent.</p></div>
 <div class="content">
 <pre><tt>E1 2B 72 00 14</tt></pre>
 </div></div>
-<div class="paragraph"><p>This tells the left-most light to iterate through the following
-16 colors, holding for 20ms at each color</p></div>
+<div class="paragraph"><p>This tells the left-most light (0x2B) to iterate through the following
+16 colors, holding for 20ms (0x0014) at each color</p></div>
 <div class="listingblock">
 <div class="title">Color Portion</div>
 <div class="content">
@@ -614,13 +698,223 @@ in milliseconds. After that, a list of 16 3-byte colors are sent.</p></div>
 10 13 35</tt></pre>
 </div></div>
 </div>
-<h2 id="_fan_commands">5. Fan Commands</h2>
+<h2 id="_fan_commands">6. Fan Commands</h2>
 <div class="sectionbody">
+<h3 id="_set_fan_to_speed">6.1. Set Fan to Speed</h3><div style="clear:left"></div>
+<h4 id="_description_3">6.1.1. Description</h4>
+<div class="paragraph"><p>Given the address of a fan, sets it to a certain speed</p></div>
+<h4 id="_setup_requirements_3">6.1.2. Setup Requirements</h4>
+<div class="paragraph"><p>Unknown</p></div>
+<h4 id="_command_index_3">6.1.3. Command Index</h4>
+<div class="listingblock">
+<div class="content">
+<pre><tt>0x01</tt></pre>
+</div></div>
+<h4 id="_parameters_3">6.1.4. Parameters</h4>
+<div class="paragraph"><p>1 byte, speed to set fan to</p></div>
+<h4 id="_example_command_3">6.1.5. Example Command</h4>
+<div class="listingblock">
+<div class="title">Set Right Fan to Full Speed</div>
+<div class="content">
+<pre><tt>Data: A1 6B 01 FF</tt></pre>
+</div></div>
+<h3 id="_timed_fan_sequence">6.2. Timed Fan Sequence</h3><div style="clear:left"></div>
+<h4 id="_description_4">6.2.1. Description</h4>
+<div class="paragraph"><p>Given the address of a fan and a delay value, iterate through a list
+of speeds, holding each speed for the specified delay value.</p></div>
+<h4 id="_setup_requirements_4">6.2.2. Setup Requirements</h4>
+<div class="paragraph"><p>Unknown</p></div>
+<h4 id="_command_index_4">6.2.3. Command Index</h4>
+<div class="listingblock">
+<div class="content">
+<pre><tt>0x74</tt></pre>
+</div></div>
+<h4 id="_parameters_4">6.2.4. Parameters</h4>
+<div class="paragraph"><p>Byte 3 (Nibbles 6-7) and 4 (Nibbles 8-9) denote the 16-bit delay time,
+in milliseconds. After that, a list of up to 48 8-bit speeds.</p></div>
+<h4 id="_example_command_4">6.2.5. Example Command</h4>
+<div class="listingblock">
+<div class="title">Full Command</div>
+<div class="content">
+<pre><tt>61 6B 72 00 8A 68 00 65 00 61 00 5E 00 5B 00 58
+00 54 00 51 00 4E 00 4B 00 47 00 44 00 41 00 3D
+00 3A 00 37 00 34 00 30 00 2D 00 2A 00 26 00 23
+00 20 00 00 00</tt></pre>
+</div></div>
+<div class="listingblock">
+<div class="title">Command</div>
+<div class="content">
+<pre><tt>61 6B 72 00 8A</tt></pre>
+</div></div>
+<div class="paragraph"><p>This tells the right fan (0x6B) to iterate through the following
+48 speeds, holding for 138ms (0x008A) at each speed</p></div>
+<div class="listingblock">
+<div class="title">Speed Portion</div>
+<div class="content">
+<pre><tt>68
+00
+65
+00
+61
+00
+5E
+00
+5B
+00
+58
+00
+54
+00
+51
+00
+4E
+00
+4B
+00
+47
+00
+44
+00
+41
+00
+3D
+00
+3A
+00
+37
+00
+34
+00
+30
+00
+2D
+00
+2A
+00
+26
+00
+23
+00
+20
+00
+00
+00</tt></pre>
+</div></div>
 </div>
-<h2 id="_rumble_commands">6. Rumble Commands</h2>
+<h2 id="_rumble_commands">7. Rumble Commands</h2>
 <div class="sectionbody">
+<h3 id="_timed_vibration_sequence">7.1. Timed Vibration Sequence</h3><div style="clear:left"></div>
+<h4 id="_description_5">7.1.1. Description</h4>
+<div class="paragraph"><p>Given the address of a rumble bar and a delay value, iterate through a list
+of speeds, holding each speed for the specified delay value.</p></div>
+<h4 id="_setup_requirements_5">7.1.2. Setup Requirements</h4>
+<div class="paragraph"><p>Unknown</p></div>
+<h4 id="_command_index_5">7.1.3. Command Index</h4>
+<div class="listingblock">
+<div class="content">
+<pre><tt>0x74</tt></pre>
+</div></div>
+<h4 id="_parameters_5">7.1.4. Parameters</h4>
+<div class="paragraph"><p>Byte 3 (Nibbles 6-7) and 4 (Nibbles 8-9) denote the 16-bit delay time,
+in milliseconds. After that, a list of up to 24 8-bit pairs (right and left
+motor) of speeds.</p></div>
+<h4 id="_example_command_5">7.1.5. Example Command</h4>
+<div class="listingblock">
+<div class="title">Full Command</div>
+<div class="content">
+<pre><tt>61 7B 72 00 8A 68 00 65 00 61 00 5E 00 5B 00 58
+00 54 00 51 00 4E 00 4B 00 47 00 44 00 41 00 3D
+00 3A 00 37 00 34 00 30 00 2D 00 2A 00 26 00 23
+00 20 00 00 00</tt></pre>
+</div></div>
+<div class="listingblock">
+<div class="title">Command</div>
+<div class="content">
+<pre><tt>61 7B 72 00 8A</tt></pre>
+</div></div>
+<div class="paragraph"><p>This tells the rumble bar (0x7B) to iterate through the following
+24 speeds, holding for 138ms (0x008A) at each speed</p></div>
+<div class="listingblock">
+<div class="title">Speed Portion</div>
+<div class="content">
+<pre><tt>68 00
+65 00
+61 00
+5E 00
+5B 00
+58 00
+54 00
+51 00
+4E 00
+4B 00
+47 00
+44 00
+41 00
+3D 00
+3A 00
+37 00
+34 00
+30 00
+2D 00
+2A 00
+26 00
+23 00
+20 00
+00 00</tt></pre>
+</div></div>
 </div>
-<h2 id="_further_information">7. Further Information</h2>
+<h2 id="_questions">8. Questions</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+The 0x7? commands seem to be basically equivilent between devices
+  and usage, i.e 0x72 and 0x74 seem to do the same thing?
+</p>
+</li>
+<li>
+<p>
+What is the 0x7C device? The rumble bar reacts to it?
+</p>
+</li>
+<li>
+<p>
+What do the following messages mean? They keep showing up (X denotes
+  first iteration nibble, can be ignored)
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+X1 F2 01 07
+</p>
+</li>
+<li>
+<p>
+The following pair, which always comes in order
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+X1 01 03 00 00 3B
+</p>
+</li>
+<li>
+<p>
+X1 01 03 00 3B 3B
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+X1 Y1 00 01 08 - Where Y is 0-8?
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</div>
+<h2 id="_further_information">9. Further Information</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>For further information, visit:</p></div>
 <div class="ulist"><ul>
@@ -644,7 +938,7 @@ in milliseconds. After that, a list of 16 3-byte colors are sent.</p></div>
 <div id="footer">
 <div id="footer-text">
 Version 1.0<br />
-Last updated 2009-05-02 20:48:59 PDT
+Last updated 2009-05-02 23:34:08 PDT
 </div>
 </div>
 </body>
