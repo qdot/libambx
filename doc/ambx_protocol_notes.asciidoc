@@ -1,0 +1,143 @@
+AmbX Protocol Documentation
+===========================
+Kyle Machulis <kyle@nonpolynomial.com>
+v1.0, May 2 2009
+
+== Introduction ==
+
+This document provides protocol information for the AmbX ambient
+environment system, with a goal of providing developers with enough
+low level information to developer their own drivers and software to
+harness the AmbX protocol.
+
+Information on the AmbX product is available at the AmbX website:
+
+http://www.ambx.com
+
+== Device information ==
+
+== Protocol Information ==
+
+The AmbX Communications protocol works over full-speed USB 2.0. It
+addresses the system through simple bulk read/writes commands.
+
+=== Protocol Format ===
+
+.Protocol Example
+-----------------------
+Index: 01 23 45 67 89 AB CD EF
+ Data: A1 2B 03 00 00 00 
+-----------------------
+
+Byte 0 - Nibble 0::
+This is a sequence that is monotonically increasing
+and rolling over. It begins at 0 for the first command, 1 for the
+second, etc... until 16 commands have been sent, then returns to
+zero. In the above example packet, we have hit the 11th packet since
+we rolled over, so the value is 0xA
+Byte 0 - Nibble 1::
+This value is significant, but it is not yet known what it is
+Byte 1 (Nibble 2-3)::
+This value is the address of the unit being commanded. In the example,
+0x1B refers to the left lighting node of the wall washer unit.
+Byte 2 (Nibble 4-5)::
+This value is the command to send to the unit. In the example, 0x03 is
+the command to set a light to a certain color
+All remaining bytes::
+Remaining bytes are parameters to the send command, and are specific
+to the command. In the example, 0x00 0x00 0x00 means that the color to
+be set in the left wall washer unit light is black.
+
+==  Light Commands ==
+
+=== Set Light To Color ===
+
+==== Description ====
+Given the address of a light, sets it to a certain RGB Color
+
+==== Setup Requirements ====
+Unknown
+
+==== Command Index ====
+----
+0x03
+----
+
+==== Parameters ====
+3 bytes, denoting the values to set the red, green, and blue channels
+to.
+
+==== Example Command ====
+-----------------------
+Index: 01 23 45 67 89 AB
+ Data: A1 2B 03 00 00 00 
+-----------------------
+
+=== Timed Color Sequence ===
+
+==== Description ====
+Given the address of a light and a delay value, iterate through a list
+of colors, holding each color for the specified delay value.
+
+==== Setup Requirements ====
+Unknown
+
+==== Command Index ====
+----
+0x72
+----
+
+==== Parameters ====
+Byte 3 (Nibbles 6-7) and 4 (Nibbles 8-9) denote the 16-bit delay time,
+in milliseconds. After that, a list of 16 3-byte colors are sent.
+
+==== Example Command ====
+
+.Full Command
+-----------------------------------------------
+E1 2B 72 00 14 00 00 00 01 01 03 02 02 07 03 03
+0A 04 05 0E 05 06 11 06 07 15 07 08 19 08 0A 1C 
+09 0B 20 0A 0C 23 0B 0E 27 0C 0F 2A 0E 10 2E 0F 
+11 32 10 13 35
+-----------------------------------------------
+
+.Command
+--------------
+E1 2B 72 00 14
+--------------
+
+This tells the left-most light (0x2B) to iterate through the following
+16 colors, holding for 20ms (0x0014) at each color
+
+.Color Portion
+---------
+00 00 00 
+01 01 03 
+02 02 07 
+03 03 0A 
+04 05 0E 
+05 06 11 
+06 07 15 
+07 08 19 
+08 0A 1C 
+09 0B 20 
+0A 0C 23 
+0B 0E 27 
+0C 0F 2A 
+0E 10 2E 
+0F 11 32 
+10 13 35
+---------
+
+== Fan Commands ==
+
+== Rumble Commands ==
+
+== Further Information ==
+
+For further information, visit:
+
+- http://www.github.com/qdot/libambx/[libambx github repo site]
+- http://electrosthetics.blogspot.com/[Electrosthetics]
+- http://www.nonpolynomial.com/[Nonpolynomial Labs]
+
