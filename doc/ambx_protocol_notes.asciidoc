@@ -16,6 +16,12 @@ http://www.ambx.com
 
 == Device information ==
 
+The device has 3 endpoints
+
+*0x02 - Out 
+*0x81 - In
+*0x83 - In - Constantly polled, used for plug and play detection
+
 == Protocol Information ==
 
 The AmbX Communications protocol works over full-speed USB 2.0. It
@@ -48,6 +54,32 @@ Remaining bytes are parameters to the send command, and are specific
 to the command. In the example, 0x00 0x00 0x00 means that the color to
 be set in the left wall washer unit light is black.
 
+=== Internal Device Addresses
+
+0x0B::
+Left Speaker light
+0x1B::
+Right Speaker light
+0x2B::
+Left (when viewed from front) Wall Washer light
+0x3B::
+Middle Wall Washer light
+0x4B::
+Right Wall Washer light
+0x5B::
+Left Fan
+0x6B::
+Right Fan
+0x7B::
+Vibration Bar
+0x7C::
+Also Vibration Bar?
+
+== Initialization ==
+
+There's some sort of initialization step when the device is
+connected. What is it?
+
 ==  Light Commands ==
 
 === Set Light To Color ===
@@ -68,9 +100,10 @@ Unknown
 to.
 
 ==== Example Command ====
+
+.Set Left Wall Washer Light to Full Blue
 -----------------------
-Index: 01 23 45 67 89 AB
- Data: A1 2B 03 00 00 00 
+A1 2B 03 00 00 FF
 -----------------------
 
 === Timed Color Sequence ===
@@ -131,7 +164,197 @@ This tells the left-most light (0x2B) to iterate through the following
 
 == Fan Commands ==
 
+=== Set Fan to Speed ===
+
+==== Description ====
+Given the address of a fan, sets it to a certain speed
+
+==== Setup Requirements ====
+Unknown
+
+==== Command Index ====
+----
+0x01
+----
+
+==== Parameters ====
+1 byte, speed to set fan to
+
+==== Example Command ====
+
+.Set Right Fan to Full Speed
+-----------------------
+Data: A1 6B 01 FF
+-----------------------
+
+=== Timed Fan Sequence ===
+
+==== Description ====
+Given the address of a fan and a delay value, iterate through a list
+of speeds, holding each speed for the specified delay value.
+
+==== Setup Requirements ====
+Unknown
+
+==== Command Index ====
+----
+0x74
+----
+
+==== Parameters ====
+Byte 3 (Nibbles 6-7) and 4 (Nibbles 8-9) denote the 16-bit delay time,
+in milliseconds. After that, a list of up to 48 8-bit speeds.
+
+==== Example Command ====
+
+.Full Command
+-----------------------------------------------
+61 6B 72 00 8A 68 00 65 00 61 00 5E 00 5B 00 58 
+00 54 00 51 00 4E 00 4B 00 47 00 44 00 41 00 3D 
+00 3A 00 37 00 34 00 30 00 2D 00 2A 00 26 00 23 
+00 20 00 00 00
+-----------------------------------------------
+
+.Command
+--------------
+61 6B 72 00 8A
+--------------
+
+This tells the right fan (0x6B) to iterate through the following
+48 speeds, holding for 138ms (0x008A) at each speed
+
+.Speed Portion
+---------
+68 
+00 
+65 
+00 
+61 
+00 
+5E 
+00 
+5B
+00 
+58 
+00 
+54 
+00 
+51 
+00 
+4E 
+00 
+4B 
+00 
+47 
+00 
+44 
+00 
+41 
+00 
+3D 
+00 
+3A 
+00 
+37 
+00 
+34 
+00 
+30 
+00 
+2D 
+00 
+2A 
+00 
+26 
+00 
+23 
+00 
+20 
+00 
+00 
+00
+---------
+
 == Rumble Commands ==
+
+=== Timed Vibration Sequence ===
+
+==== Description ====
+Given the address of a rumble bar and a delay value, iterate through a list
+of speeds, holding each speed for the specified delay value.
+
+==== Setup Requirements ====
+Unknown
+
+==== Command Index ====
+----
+0x74
+----
+
+==== Parameters ====
+Byte 3 (Nibbles 6-7) and 4 (Nibbles 8-9) denote the 16-bit delay time,
+in milliseconds. After that, a list of up to 24 8-bit pairs (right and left
+motor) of speeds.
+
+==== Example Command ====
+
+.Full Command
+-----------------------------------------------
+61 7B 72 00 8A 68 00 65 00 61 00 5E 00 5B 00 58 
+00 54 00 51 00 4E 00 4B 00 47 00 44 00 41 00 3D 
+00 3A 00 37 00 34 00 30 00 2D 00 2A 00 26 00 23 
+00 20 00 00 00
+-----------------------------------------------
+
+.Command
+--------------
+61 7B 72 00 8A
+--------------
+
+This tells the rumble bar (0x7B) to iterate through the following
+24 speeds, holding for 138ms (0x008A) at each speed
+
+.Speed Portion
+---------
+68 00 
+65 00 
+61 00 
+5E 00 
+5B 00 
+58 00 
+54 00 
+51 00 
+4E 00 
+4B 00 
+47 00 
+44 00 
+41 00 
+3D 00 
+3A 00 
+37 00 
+34 00 
+30 00 
+2D 00 
+2A 00 
+26 00 
+23 00 
+20 00 
+00 00
+---------
+
+== Questions ==
+
+* The 0x7? commands seem to be basically equivilent between devices
+  and usage, i.e 0x72 and 0x74 seem to do the same thing?
+* What is the 0x7C device? The rumble bar reacts to it?
+* What do the following messages mean? They keep showing up (X denotes
+  first iteration nibble, can be ignored)
+** X1 F2 01 07
+** The following pair, which always comes in order
+*** X1 01 03 00 00 3B
+*** X1 01 03 00 3B 3B
+** X1 Y1 00 01 08 - Where Y is 0-8?
+
 
 == Further Information ==
 
