@@ -1,6 +1,6 @@
 ---
 layout: front
 project: libambx
-title: Crossplatform, open source driver for the amBX System
+title: Open source driver for the amBX System
 ---
 
