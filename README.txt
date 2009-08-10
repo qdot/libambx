@@ -5,6 +5,9 @@ libambx
 by Kyle Machulis <kyle@nonpolynomial.com>
 Nonpolynomial Labs - http://www.nonpolynomial.com
 
+Hardware Diagrams by Electrosthetics
+http://electrosthetics.blogspot.com/
+
 ===========
 Description
 ===========
