@@ -44,11 +44,10 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #################################################################
 
-import sys
+import sys, os
 
 #Requires PyUSB
 #http://pyusb.berlios.de/
-
 import usb
 
 class ambx:
@@ -109,28 +108,19 @@ class ambx:
 
         Returns True if open successful, False otherwise.
         """
-        device_count = 0
-        for bus in usb.busses():
-            devices = bus.devices
-            for dev in devices:
-                if dev.idVendor == self.AMBX_VENDOR_ID and dev.idProduct == self.AMBX_PRODUCT_ID :
-                    if device_count == index:
-                        self.ambx_device = dev
-                        break;
-                    device_count += 1            
+        self.ambx_device = usb.core.find(idVendor = self.AMBX_VENDOR_ID, 
+                                               idProduct = self.AMBX_PRODUCT_ID)
         if self.ambx_device is None:
             return False
-        self.ambx_handle = self.ambx_device.open()
-        self.ambx_handle.setConfiguration(1)
-        self.ambx_handle.claimInterface(0)
+        self.ambx_device.set_configuration(1)
+        #self.ambx_device.claim_interface(0)
         return True
 
     def close(self):
         """Closes the amBX device currently held by the object, 
         if it is open."""
-        if self.ambx_handle is not None:
-            self.ambx_handle.releaseInterface() 
-            self.ambx_handle = None
+        if self.ambx_device is not None:
+            self.ambx_device = None
 
     def write(self, command):
         """Given a list of raw bytes, writes them to the out endpoint of the
@@ -141,7 +131,7 @@ class ambx:
         if self.debug:
             [sys.stdout.write("0x%.2x " % ord(x)) for x in command]        
             print
-        return self.ambx_handle.bulkWrite(self.ep['out'], command, 1)
+        return self.ambx_device.write(self.ep['out'], map(ord,command), 0, 1)
 
     def read(self, size=64):
         """Reads in the requested amount of bytes
@@ -149,7 +139,7 @@ class ambx:
         
         Returns list of bytes read.
         """
-        status = self.ambx_handle.bulkRead(self.ep['in'], size, 1)
+        status = self.ambx_device.read(self.ep['in'], size, 0, 1)
 
     def compileCommand(self, address, command, parameters):
         """Given an address (1 byte), command (1 byte), and parameter (list),
@@ -236,10 +226,19 @@ def main(argv=None):
 
     #Some things you can do
     #ambx_device.setFanSpeed(ambx.LEFT_FAN, 0xFF)
-    #ambx_device.setLightColor(ambx.LEFT_WW_LIGHT, [0, 0, 0xFF])
-    #ambx_device.setLightColor(ambx.CENTER_WW_LIGHT, [0, 0xFF, 0])
-    #ambx_device.setLightColor(ambx.RIGHT_WW_LIGHT, [0xFF, 0, 0])
-    #ambx_device.setLightColorList(ambx.LEFT_WW_LIGHT, 100, [[0, 0, x * 10] for x in range(16) ])
+
+    ambx_device.setLightColor(ambx.LEFT_WW_LIGHT, [0x70, 0x50, 0xa0])
+    ambx_device.setLightColor(ambx.CENTER_WW_LIGHT, [0x70, 0x50, 0xa0])
+    ambx_device.setLightColor(ambx.RIGHT_WW_LIGHT, [0x70, 0x50, 0xa0])
+    ambx_device.setLightColor(ambx.RIGHT_SP_LIGHT, [0x70, 0x50, 0xa0])
+
+    ambx_device.setLightColor(ambx.LEFT_SP_LIGHT, [0x70, 0x50, 0xa0])
+    #ambx_device.setLightColorList(ambx.LEFT_SP_LIGHT, 100, [[x*4, x*1, x*8] for x in range(16) ])
+    #ambx_device.setLightColorList(ambx.RIGHT_SP_LIGHT, 100, [[x*4, x*1, x*8] for x in range(16) ])
+
+    #ambx_device.setLightColorList(ambx.CENTER_WW_LIGHT, 100, [[x*4, x*1, x*6] for x in range(16) ])
+    #ambx_device.setLightColorList(ambx.LEFT_WW_LIGHT, 100, [[x*4, x*1, x*6] for x in range(16) ])
+    #ambx_device.setLightColorList(ambx.RIGHT_WW_LIGHT, 100, [[x*4, x*1, x*6] for x in range(16) ])
     #ambx_device.setFanSpeedList(ambx.LEFT_FAN, 1000, range(0, 255, 255/48))
     #ambx_device.setFanSpeed(ambx.LEFT_FAN, 0)
     ambx_device.close()
